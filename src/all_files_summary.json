@@ -1,0 +1,22 @@
+{
+  "backend/main.mo": "Motoko backend managing two-bidder auctions, including state, bidding logic, player sales, and auction lifecycle functions.",
+  "feature_evidence.json": "Feature evidence report linking an error‑message improvement to affected frontend files and components.",
+  "frontend-file-summaries.txt": "Prewritten summaries of all main frontend files describing their purpose and behavior.",
+  "frontend/index.css": "Global Tailwind CSS variables and theming for light/dark modes using an OKLCH color palette.",
+  "frontend/index.html": "Static HTML entry point loading the React application.",
+  "frontend/src/App.tsx": "Root React component handling navigation between setup, auction, and results screens.",
+  "frontend/src/components/auction/AuctionScreen.tsx": "UI for live auction interactions including bidding, starting rounds, and error display using React Query.",
+  "frontend/src/components/auction/guards.ts": "Provides validation helpers for auction setup and bids, ensuring valid names, player lists, and bid amounts.",
+  "frontend/src/components/auction/ResultsScreen.tsx": "Displays final bidder rosters, spending summaries, and full sales history after the auction ends.",
+  "frontend/src/components/auction/SetupScreen.tsx": "Form for entering bidder and player names and initializing a new auction.",
+  "frontend/src/components/layout/AppLayout.tsx": "Defines the main application layout with header navigation, footer, and screen switching.",
+  "frontend/src/hooks/useActor.ts": "Creates and manages the backend actor instance, refreshing dependent queries on identity changes.",
+  "frontend/src/hooks/useAuctionQueries.ts": "Wraps backend auction operations with React Query hooks for state fetching, initialization, bidding, and selling.",
+  "frontend/src/hooks/useInternetIdentity.ts": "Implements Internet Identity authentication context, loading, login, and identity management.",
+  "frontend/src/index.css": "Tailwind base styles and custom theme variables for the auction app’s light and dark modes.",
+  "frontend/src/main.tsx": "Bootstraps the React app with Internet Identity and React Query providers.",
+  "frontend/src/utils/backendErrors.ts": "Normalizes backend errors into clean, user‑friendly messages.",
+  "frontend/src/utils/format.ts": "Formatting helpers for CR amounts, player status, and highest bidder display.",
+  "frontend/tailwind.config.js": "Tailwind configuration with custom colors, fonts, animations, and plugin setup.",
+  "project_state.json": "Defines current project state, existing features, new feature requests, and known issues for a 2‑bidder, 10‑player auction app. Highlights a bidding flow bug and tracks requirements for frontend and backend development."
+}

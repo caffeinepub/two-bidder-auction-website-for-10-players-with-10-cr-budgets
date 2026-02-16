@@ -1,0 +1,26 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-16T13:48:02.276Z",
+  "summary": "REQ-9 appears implemented on the frontend via backend error normalization and propagating readable English error messages through React Query mutations. REQ-8 cannot be confirmed from the provided backend diff snippet because the `bidPlayer` implementation/validation logic is not shown (file is truncated before that function).",
+  "missing_requirements": [
+    {
+      "id": "REQ-8",
+      "requirement": "Fix backend `bidPlayer` validation to accept the two configured bidder names by checking membership in `auctionState.bidders` (and exactly 2 bidders), and trap with a clear English error if bidder is not part of the current auction.",
+      "reason": "The diff summary shows `startNewAuction` storing bidder names in `auctionState.bidders`, but does not show any changes to `bidPlayer` (the relevant validation logic). Since `backend/main.mo` is truncated before `bidPlayer`, there is no evidence that the hardcoded bidder-name check was replaced with a membership check or that the new trap message was added.",
+      "evidence": [
+        "backend/main.mo (truncated before bidPlayer)"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.58,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/auction/AuctionScreen.tsx",
+    "frontend/src/hooks/useAuctionQueries.ts",
+    "frontend/src/utils/backendErrors.ts",
+    "project_state.json"
+  ]
+}

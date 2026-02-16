@@ -1,0 +1,53 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-16T13:48:02.278Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 2,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-8",
+        "summary": "Fix the backend bidding validation so that placing a bid accepts the two configured bidder names (entered during setup) instead of only accepting the hardcoded names \"Bidder 1\" and \"Bidder 2\".",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Update the user-facing error message shown when a bid fails due to an invalid bidder so it is clear and grammatically correct in English (e.g., indicate that the selected bidder is not part of the auction).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/backendErrors.ts",
+          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/components/auction/AuctionScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/backendErrors.ts",
+          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/components/auction/AuctionScreen.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "caffeine.lock.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/auction/AuctionScreen.tsx",
+    "frontend/src/hooks/useAuctionQueries.ts",
+    "frontend/src/utils/backendErrors.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

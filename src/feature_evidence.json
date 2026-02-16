@@ -1,0 +1,25 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-user-facing-error-message-shown-when-a-bid-fails-due-to-an-invalid-bidder-so-it-is-clear-and-grammatically-correct-in-english-e-g-indicate-that-the-selected-bidder-is-not-part-of-the-auction",
+      "featureTitle": "Update the user-facing error message shown when a bid fails due to an invalid bidder so it is clear and grammatically correct in English (e.g., indicate that the selected bidder is not part of the auction).",
+      "files": [
+        "frontend/src/components/auction/AuctionScreen.tsx",
+        "frontend/src/hooks/useAuctionQueries.ts",
+        "frontend/src/utils/backendErrors.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

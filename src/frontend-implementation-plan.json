@@ -1,0 +1,32 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Improve bid-failure error messaging for invalid bidder selection",
+  "requirements": [
+    {
+      "id": "REQ-9",
+      "summary": "Ensure bid failures caused by an invalid bidder show a clear, grammatical English message in the existing bidding error UI.",
+      "acceptanceCriteria": [
+        "When the backend rejects a bid due to an invalid bidder, the UI displays the backend error message in readable English (no duplicated words, no confusing reference to \"players\").",
+        "The error state remains within the existing bidding error UI (no crashes; the auction screen continues to function)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/backendErrors.ts",
+          "operation": "create",
+          "description": "Create a small utility to normalize/unwrap errors returned from backend calls into a readable English message (e.g., extract a useful message from thrown values and clean up obvious duplication/whitespace) so the UI can reliably display it. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useAuctionQueries.ts",
+          "operation": "modify",
+          "description": "Update the bidding mutation to catch backend bid failures and rethrow a normalized Error message using the new error-normalization utility, so React Query error.message is clear and user-ready when an invalid bidder is provided. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auction/AuctionScreen.tsx",
+          "operation": "modify",
+          "description": "Ensure the existing bid error <Alert> displays the improved, normalized mutation error message (and keeps the auction screen functional without crashes) when a bid fails due to an invalid bidder. Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

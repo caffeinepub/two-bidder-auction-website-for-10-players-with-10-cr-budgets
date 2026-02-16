@@ -1,0 +1,14 @@
+{
+  "frontend/src/index.css": "Global styles with sports auction theme using green and orange OKLCH color palette for light and dark modes, avoiding blue/purple primaries.",
+  "frontend/tailwind.config.js": "Tailwind configuration extended with custom fonts (Inter), success/warning colors, glow shadows, and pulse animation for the auction theme.",
+  "frontend/src/App.tsx": "Main application component managing screen navigation between Setup, Auction, and Results views with state-driven routing.",
+  "frontend/src/components/layout/AppLayout.tsx": "Reusable layout wrapper providing consistent header with navigation, branding, and footer with attribution across all screens.",
+  "frontend/src/components/auction/SetupScreen.tsx": "Setup screen for configuring auction with 2 bidder names and 10 player names, including client-side validation and backend initialization.",
+  "frontend/src/components/auction/AuctionScreen.tsx": "Live auction screen with improved error display that shows normalized backend error messages in a user-friendly format without crashes.",
+  "frontend/src/components/auction/ResultsScreen.tsx": "Results screen showing final rosters, spending summaries, sales history table, and unsold players with option to reset auction.",
+  "frontend/src/components/auction/guards.ts": "Client-side validation helpers for setup form (2 bidders, 10 unique players) and bid validation (amount, budget, highest bid checks).",
+  "frontend/src/hooks/useAuctionQueries.ts": "React Query hooks for all backend operations with normalized error handling that wraps backend errors in readable English messages.",
+  "frontend/src/utils/format.ts": "Utility functions for formatting bigint amounts to CR display format and helper functions for player status and bidder display.",
+  "frontend/src/main.tsx": "Application entry point with React Query client configuration for optimal refetching and error handling behavior.",
+  "frontend/src/utils/backendErrors.ts": "Utility for normalizing backend errors into user-friendly messages, cleaning up duplicates, typos, and IC-specific error prefixes."
+}

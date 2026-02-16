@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Website for conducting an auction of 10 players between 2 bidders, where each bidder has a fixed budget of 10 cr.",
+  "architectural_notes": [],
+  "known_issues": [
+    "Bidding flow bug: when selecting a bidder (with a correct bid amount entered), app shows error message like \"only 2 two bidders can bid\" and blocks bidding."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-build-a-frontend-ui-that-allows-users-to-1-configure-the-auction-enter-2-bidder-names-and-10-player-names-2-run-the-auction-select-current-player-enter-bids-finalize-sale-and-3-view-results-rosters-remaining-budgets-sold-unsold-list-and-sales-history",
+      "title": "Build a frontend UI that allows users to: (1) configure the auction (enter 2 bidder names and 10 player names), (2) run the auction (select current player, enter bids, finalize sale), and (3) view results (rosters, remaining budgets, sold/unsold list, and sales history).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-connect-frontend-to-the-motoko-backend-using-react-query-for-data-fetching-mutations-including-loading-success-and-error-states-for-all-auction-actions",
+      "title": "Connect frontend to the Motoko backend using React Query for data fetching/mutations, including loading, success, and error states for all auction actions.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-coherent-visual-theme-and-layout-style-across-the-app-colors-typography-spacing-and-component-styling-appropriate-for-a-sports-player-auction-dashboard-avoiding-a-blue-purple-primary-palette",
+      "title": "Add a coherent visual theme and layout style across the app (colors, typography, spacing, and component styling) appropriate for a sports-player auction dashboard, avoiding a blue/purple primary palette.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-user-facing-error-message-shown-when-a-bid-fails-due-to-an-invalid-bidder-so-it-is-clear-and-grammatically-correct-in-english-e-g-indicate-that-the-selected-bidder-is-not-part-of-the-auction",
+      "title": "Update the user-facing error message shown when a bid fails due to an invalid bidder so it is clear and grammatically correct in English (e.g., indicate that the selected bidder is not part of the auction).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Build an auction website for 10 players with 2 bidders, each starting with a 10 cr budget cap.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Create backend data models and persisted state for an auction of exactly 10 players and exactly 2 bidders, where each bidder starts with a fixed budget of 10 cr.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement backend methods to initialize/reset an auction with two bidder names and a list of 10 player names, and to fetch the complete current auction state for UI rendering.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Implement backend auction flow operations: start auctioning a specific unsold player, place a bid by one of the two bidders, and finalize (sell) the current player to the highest bidder.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement backend validation and invariants to enforce: only two bidders participate; total spend per bidder never exceeds 10 cr; and a player can be sold at most once.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Fix the backend bidding validation so that placing a bid accepts the two configured bidder names (entered during setup) instead of only accepting the hardcoded names \"Bidder 1\" and \"Bidder 2\".",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Two-bidder auction website for 10 players with 10 cr budgets",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

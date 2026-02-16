@@ -1,9 +1,11 @@
-import Text "mo:core/Text";
+import Array "mo:core/Array";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import Text "mo:core/Text";
 import Time "mo:core/Time";
-import Array "mo:core/Array";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   public type PlayerState = {
     name : Text;
@@ -40,6 +42,13 @@ actor {
     state : AuctionState;
   };
 
+  public type AudienceLimit = {
+    status : Text;
+    currentCount : Nat;
+    maxCapacity : Nat;
+    message : Text;
+  };
+
   type PlayerCategory = {
     name : Text;
     price : ?Nat;
@@ -59,8 +68,57 @@ actor {
     roundStartTime = 0;
   } : AuctionState;
 
-  // Game state
   let maxBudget = 1_000; // In rupees (1 CR = 100 rupees)
+  let maxAudienceSize = 13;
+  var currentAudienceCount = 0;
+  var isAuctionActive = false;
+
+  public query ({ caller }) func checkAudienceCapacity() : async AudienceLimit {
+    if (currentAudienceCount >= maxAudienceSize and isAuctionActive) {
+      {
+        status = "full";
+        currentCount = currentAudienceCount;
+        maxCapacity = maxAudienceSize;
+        message = "Audience is at full capacity. You cannot join at this moment.";
+      };
+    } else if (not isAuctionActive) {
+      {
+        status = "waiting";
+        currentCount = currentAudienceCount;
+        maxCapacity = maxAudienceSize;
+        message = "The auction hasn't started yet.";
+      };
+    } else {
+      {
+        status = "open";
+        currentCount = currentAudienceCount;
+        maxCapacity = maxAudienceSize;
+        message = "You can join the audience!";
+      };
+    };
+  };
+
+  public shared ({ caller }) func joinAudience() : async Bool {
+    switch (isAuctionActive, currentAudienceCount >= maxAudienceSize) {
+      case (false, false) { Runtime.trap("Auction not started") };
+      case (true, true) { Runtime.trap("Audience is at maximum capacity") };
+      case (true, false) {
+        if (currentAudienceCount < maxAudienceSize) {
+          currentAudienceCount += 1;
+          return true;
+        };
+      };
+      case (false, true) { Runtime.trap("Auction not started & full audience?") };
+    };
+    false;
+  };
+
+  public shared ({ caller }) func leaveAudience() : async Bool {
+    if (currentAudienceCount > 0) {
+      currentAudienceCount -= 1;
+      true;
+    } else { false };
+  };
 
   public shared ({ caller }) func startNewAuctionWithSecretKey(
     bidder1Name : Text,
@@ -88,6 +146,7 @@ actor {
       roundStartTime = 0;
     };
     secretKey := ?newSecretKey;
+    isAuctionActive := true;
     auctionState;
   };
 
@@ -123,7 +182,6 @@ actor {
         };
       }
     );
-
     auctionState := { auctionState with bidders = updatedBiddersList };
   };
 

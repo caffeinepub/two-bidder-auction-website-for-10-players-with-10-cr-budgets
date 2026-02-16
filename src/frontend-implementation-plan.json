@@ -1,50 +1,67 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Switch auction UI from CR-scaled amounts to ₹ rupees (₹1000 budget)",
+  "title": "Audience live call capacity UI integration (13 max)",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Update frontend formatting, labels, and bid parsing to treat all amounts as rupees (₹) with a ₹1000 initial budget baseline.",
+      "id": "REQ-1",
+      "summary": "Integrate backend-enforced audience capacity (max 13) into the Audience screen flow so the UI respects backend rejection and handles idempotent joins.",
       "acceptanceCriteria": [
-        "frontend/src/utils/format.ts formats bigint amounts as rupees with a ₹ prefix (no CR conversion, no 1_000_000_000_000 scaling).",
-        "frontend/src/components/auction/AuctionScreen.tsx no longer multiplies the entered bid amount by 1_000_000_000_000; the entered numeric value is interpreted as rupees and converted to bigint rupees.",
-        "AuctionScreen UI text reflects rupees (e.g., 'Bid Amount (₹)' instead of 'Bid Amount (CR)'), and bidder remaining/spent displays show ₹ values.",
-        "frontend/src/components/auction/SetupScreen.tsx bidder section description is updated from '(10 CR each)' to '(₹1000 each)'.",
-        "frontend/src/components/auction/ResultsScreen.tsx spent calculation is updated to subtract from a single shared initial budget constant of 1000n (not 10_000_000_000_000n), and all displayed prices are formatted as ₹.",
-        "frontend/src/components/auction/guards.ts validation messages that currently mention 'CR' are updated to mention rupees and use the same ₹ formatting approach as the rest of the app.",
-        "Audience view (frontend/src/components/auction/AudienceScreen.tsx) shows highest bid and budgets formatted as ₹ via the updated formatter."
+        "When a 14th unique audience principal attempts to join, the backend rejects the request with a clear error message indicating the audience limit (13) has been reached.",
+        "The limit is enforced server-side (Motoko), not only via UI checks.",
+        "Re-joining from the same principal does not consume an additional slot (idempotent join)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/format.ts",
+          "path": "frontend/src/hooks/useAuctionQueries.ts",
           "operation": "modify",
-          "description": "Update formatAmount to display bigint values as rupees with a ₹ prefix and no CR scaling; introduce and export a shared INITIAL_BUDGET_RUPEES = 1000n constant for consistent 'spent' calculations across screens."
-        },
-        {
-          "path": "frontend/src/components/auction/AuctionScreen.tsx",
-          "operation": "modify",
-          "description": "Interpret bid input as rupees (convert entered numeric value directly to bigint rupees without 1_000_000_000_000 multiplication), update bid amount label text to 'Bid Amount (₹)', and compute/display bidder 'Spent' using INITIAL_BUDGET_RUPEES - remainingAmount with rupee formatting."
-        },
-        {
-          "path": "frontend/src/components/auction/SetupScreen.tsx",
-          "operation": "modify",
-          "description": "Update the bidders section description text from '(10 CR each)' to '(₹1000 each)' to match the rupee-based budget."
-        },
-        {
-          "path": "frontend/src/components/auction/ResultsScreen.tsx",
-          "operation": "modify",
-          "description": "Update totalSpent computation to use INITIAL_BUDGET_RUPEES - remainingAmount instead of the prior CR-scaled constant, ensuring all displayed spending/remaining/price values continue to use the shared ₹ formatter."
-        },
-        {
-          "path": "frontend/src/components/auction/guards.ts",
-          "operation": "modify",
-          "description": "Replace CR-specific formatting and 'CR' wording in bid validation messages with rupee-aware wording and formatting by reusing the shared formatAmount utility (remove the local formatBigIntToCR helper)."
+          "description": "Add React Query hooks/mutations that call existing backend capabilities related to audience presence (join/leave) and capacity checks, normalizing failures via the existing backend error utilities. This will be used by the Audience screen to react to backend-enforced capacity and idempotent join semantics."
         },
         {
           "path": "frontend/src/components/auction/AudienceScreen.tsx",
           "operation": "modify",
-          "description": "Confirm all displayed monetary values (highest bid, bidder budgets, sold prices) are presented via the updated rupee formatter; adjust any residual CR text if present."
+          "description": "Update AudienceScreen to perform a join attempt before starting live auction polling/rendering, and to transition into a dedicated error state when the backend denies entry due to capacity. Use existing shadcn/ui components already imported (e.g., Alert, Badge, Card) to present the error and status. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Attempt to join the audience on Audience screen mount, leave on unmount (best-effort), and show a clear English error when the limit is reached; prevent live polling when not joined.",
+      "acceptanceCriteria": [
+        "Opening the Audience screen triggers a join call; navigating away triggers a leave call.",
+        "If join fails due to the limit, the Audience screen shows a clear error message and does not continue polling/visualizing live auction data as if joined successfully.",
+        "If join succeeds, the Audience screen continues to function normally (polling every ~2 seconds as it does today)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/auction/AudienceScreen.tsx",
+          "operation": "modify",
+          "description": "Implement mount/unmount lifecycle behavior: on mount, call the new join-audience mutation and only enable auction state polling after successful join; on unmount, trigger a best-effort leave call (do not block navigation). If join is rejected due to capacity, display an English message like \"Audience limit reached (13). Please try again later.\" and keep polling disabled. Use existing shadcn/ui Alert for error presentation. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/utils/backendErrors.ts",
+          "operation": "modify",
+          "description": "Ensure normalized backend errors remain readable for audience-join failures (including capacity-reached messages) so the Audience screen can display a clear English user-facing error state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Display and periodically refresh the current audience count as 'Audience: X/13' on the Audience screen using the backend capacity query.",
+      "acceptanceCriteria": [
+        "The Audience screen displays a count formatted like 'Audience: X/13' (English).",
+        "The displayed count updates periodically (can reuse the existing polling cadence)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useAuctionQueries.ts",
+          "operation": "modify",
+          "description": "Add a query hook that fetches current audience capacity info (e.g., current count/max capacity/message) using the backend capability designed for this, and support periodic refetching aligned with the Audience screen polling cadence."
+        },
+        {
+          "path": "frontend/src/components/auction/AudienceScreen.tsx",
+          "operation": "modify",
+          "description": "Render an 'Audience: X/13' indicator (e.g., near the Live Auction View header area) sourced from the new audience-capacity query, and refetch it periodically (can align with the existing 2-second cadence). Keep the indicator consistent with the joined/error state (e.g., still show count if available, but do not start auction polling unless joined). Use existing shadcn/ui primitives already in the file where appropriate. Verify the component's usage instructions before implementing."
         }
       ]
     }

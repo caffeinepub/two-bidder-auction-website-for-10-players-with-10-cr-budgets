@@ -38,10 +38,19 @@ export const RoundBidResult = IDL.Record({
   'bid' : AuctionBid,
   'state' : AuctionState,
 });
+export const AudienceLimit = IDL.Record({
+  'status' : IDL.Text,
+  'maxCapacity' : IDL.Nat,
+  'currentCount' : IDL.Nat,
+  'message' : IDL.Text,
+});
 
 export const idlService = IDL.Service({
   'bidPlayer' : IDL.Func([AuctionBid, IDL.Text], [RoundBidResult], []),
+  'checkAudienceCapacity' : IDL.Func([], [AudienceLimit], ['query']),
   'getAuctionState' : IDL.Func([], [AuctionState], ['query']),
+  'joinAudience' : IDL.Func([], [IDL.Bool], []),
+  'leaveAudience' : IDL.Func([], [IDL.Bool], []),
   'sellPlayer' : IDL.Func([IDL.Text], [AuctionState], []),
   'startAuction' : IDL.Func([IDL.Text], [AuctionState], []),
   'startNewAuctionWithSecretKey' : IDL.Func(
@@ -84,10 +93,19 @@ export const idlFactory = ({ IDL }) => {
     'bid' : AuctionBid,
     'state' : AuctionState,
   });
+  const AudienceLimit = IDL.Record({
+    'status' : IDL.Text,
+    'maxCapacity' : IDL.Nat,
+    'currentCount' : IDL.Nat,
+    'message' : IDL.Text,
+  });
   
   return IDL.Service({
     'bidPlayer' : IDL.Func([AuctionBid, IDL.Text], [RoundBidResult], []),
+    'checkAudienceCapacity' : IDL.Func([], [AudienceLimit], ['query']),
     'getAuctionState' : IDL.Func([], [AuctionState], ['query']),
+    'joinAudience' : IDL.Func([], [IDL.Bool], []),
+    'leaveAudience' : IDL.Func([], [IDL.Bool], []),
     'sellPlayer' : IDL.Func([IDL.Text], [AuctionState], []),
     'startAuction' : IDL.Func([IDL.Text], [AuctionState], []),
     'startNewAuctionWithSecretKey' : IDL.Func(

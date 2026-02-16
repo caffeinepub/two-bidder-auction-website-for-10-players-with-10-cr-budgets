@@ -1,18 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Auction app with secret-key bidding (secret key stored privately in the canister and not exposed).",
-  "architectural_notes": [
-    "Secret key for bidding is stored privately inside the canister and is not publicly readable/exposed."
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-all-frontend-currency-formatting-labels-and-bid-parsing-so-amounts-are-treated-and-displayed-as-rupees-rather-than-crores-cr-including-budget-spent-highest-bid-bid-input-and-results-tables",
-      "title": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
+      "id": "feature-implement-an-audience-participant-limit-of-13-concurrent-audience-members-for-the-audience-screen-enforced-by-the-backend-so-it-cannot-be-bypassed-from-the-frontend",
+      "title": "Implement an audience participant limit of 13 concurrent audience members for the Audience screen, enforced by the backend so it cannot be bypassed from the frontend.",
       "reqIds": [
-        "REQ-2"
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-audience-screen-ui-to-attempt-to-join-on-mount-and-leave-on-unmount-best-effort-and-show-an-english-user-facing-error-state-when-the-audience-limit-is-reached-e-g-audience-limit-reached-13-please-try-again-later",
+      "title": "Update the Audience screen UI to attempt to join on mount and leave on unmount (best-effort), and show an English user-facing error state when the audience limit is reached (e.g., 'Audience limit reached (13). Please try again later.').",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-the-current-audience-count-in-the-audience-screen-and-or-header-area-using-the-new-backend-query-so-viewers-can-see-how-many-audience-members-are-currently-connected-out-of-13",
+      "title": "Expose the current audience count in the Audience screen (and/or header area) using the new backend query so viewers can see how many audience members are currently connected out of 13.",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -20,20 +34,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Change bidder payout/amount to 1000 rupees (set displayed/given amount to ₹1000).",
+      "summary": "Add an audience live call participant limit of 13",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-2",
-      "summary": "Change the auction's initial bidder budget from the current large CR-based amount to exactly 1000 rupees per bidder for newly created auctions.",
+      "id": "AR-3",
+      "summary": "Add backend APIs to support audience presence tracking: a method to join the audience, a method to leave the audience, and a query method to fetch current audience count (and/or list) needed by the UI.",
       "reqIds": [
-        "REQ-1"
+        "REQ-2"
       ],
       "status": "pending"
     }
   ],
-  "projectName": "Convert bidder budget and bidding amounts to ₹1000 rupees",
+  "projectName": "Add audience live call participant limit of 13",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -7,9 +7,9 @@
   "frontend/src/components/auction/AuctionScreen.tsx": "Live auction screen with secret key input required for placing bids, showing current player, highest bid, bidder budgets in rupees (₹), and available players with improved error display.",
   "frontend/src/components/auction/ResultsScreen.tsx": "Results screen showing final rosters, spending summaries in rupees (₹), sales history table, and unsold players with option to reset auction.",
   "frontend/src/components/auction/guards.ts": "Client-side validation helpers for setup form (2 bidders, 10 unique players, and secret key) and bid validation (amount, budget, highest bid checks) with rupee formatting.",
-  "frontend/src/hooks/useAuctionQueries.ts": "React Query hooks for all backend operations including initialization with secret key and bidding with secret key validation, with normalized error handling.",
+  "frontend/src/hooks/useAuctionQueries.ts": "React Query hooks for all backend operations including auction state, bidding, and new audience operations (join, leave, check capacity) with normalized error handling.",
   "frontend/src/utils/format.ts": "Utility functions for formatting bigint amounts as rupees (₹) with INITIAL_BUDGET_RUPEES constant (1000n) and helper functions for player status and bidder display.",
   "frontend/src/main.tsx": "Application entry point with React Query client configuration for optimal refetching and error handling behavior.",
-  "frontend/src/utils/backendErrors.ts": "Utility for normalizing backend errors into user-friendly messages, cleaning up duplicates, typos, and IC-specific error prefixes.",
-  "frontend/src/components/auction/AudienceScreen.tsx": "Read-only live audience view showing current auctioned player, highest bid/bidder in rupees (₹), bidder budgets, and players table with sold/unsold status, polling every 2 seconds for real-time updates."
+  "frontend/src/utils/backendErrors.ts": "Utility for normalizing backend errors into user-friendly messages, including special handling for audience capacity errors.",
+  "frontend/src/components/auction/AudienceScreen.tsx": "Read-only live audience view that joins on mount, leaves on unmount, displays audience count (X/13), shows capacity errors when limit is reached, and polls auction data every 2 seconds only after successful join."
 }

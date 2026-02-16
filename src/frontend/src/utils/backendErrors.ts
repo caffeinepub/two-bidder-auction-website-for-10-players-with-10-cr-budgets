@@ -43,6 +43,11 @@ function cleanErrorMessage(message: string): string {
     .replace(/\bbedd\b/gi, 'bid')
     .replace(/\bplayers\b/gi, 'bidders'); // Context: "only 2 bidders can bid"
 
+  // Handle audience-specific error messages
+  if (cleaned.toLowerCase().includes('audience') && cleaned.toLowerCase().includes('capacity')) {
+    cleaned = 'Audience is at maximum capacity';
+  }
+
   // Ensure proper capitalization
   if (cleaned.length > 0) {
     cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);

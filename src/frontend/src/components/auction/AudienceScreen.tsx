@@ -1,5 +1,6 @@
-import { Loader2, Users, TrendingUp, AlertCircle } from 'lucide-react';
-import { useAuctionState } from '../../hooks/useAuctionQueries';
+import { useEffect, useState } from 'react';
+import { Loader2, Users, TrendingUp, AlertCircle, UserX } from 'lucide-react';
+import { useAuctionState, useJoinAudience, useLeaveAudience, useAudienceCapacity } from '../../hooks/useAuctionQueries';
 import { formatAmount, getHighestBidderDisplay } from '../../utils/format';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -14,9 +15,94 @@ import {
 } from '../ui/table';
 
 export function AudienceScreen() {
-  const { data: auctionState, isLoading, isError, error } = useAuctionState({
-    refetchInterval: 2000, // Poll every 2 seconds for live updates
+  const [hasJoined, setHasJoined] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  
+  const joinAudience = useJoinAudience();
+  const leaveAudience = useLeaveAudience();
+  
+  const { data: capacityData, refetch: refetchCapacity } = useAudienceCapacity({
+    refetchInterval: 2000,
   });
+
+  const { data: auctionState, isLoading, isError, error } = useAuctionState({
+    refetchInterval: hasJoined ? 2000 : false, // Only poll if successfully joined
+  });
+
+  // Attempt to join on mount
+  useEffect(() => {
+    const attemptJoin = async () => {
+      try {
+        await joinAudience.mutateAsync();
+        setHasJoined(true);
+        setJoinError(null);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to join audience';
+        setJoinError(errorMessage);
+        setHasJoined(false);
+      }
+    };
+
+    attemptJoin();
+
+    // Leave on unmount (best-effort)
+    return () => {
+      if (hasJoined) {
+        leaveAudience.mutate();
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Show loading state while attempting to join
+  if (joinAudience.isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Joining audience...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if join failed due to capacity or other reasons
+  if (joinError) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground">Live Auction View</h2>
+            <p className="text-muted-foreground mt-1">Watch the auction unfold in real-time</p>
+          </div>
+          {capacityData && (
+            <Badge variant="secondary" className="text-sm">
+              Audience: {Number(capacityData.currentCount)}/13
+            </Badge>
+          )}
+        </div>
+
+        <Alert variant="destructive">
+          <UserX className="h-4 w-4" />
+          <AlertTitle>Unable to Join Audience</AlertTitle>
+          <AlertDescription>
+            {joinError.includes('maximum capacity') || joinError.includes('full capacity')
+              ? 'Audience limit reached (13). Please try again later.'
+              : joinError}
+          </AlertDescription>
+        </Alert>
+
+        {capacityData && capacityData.status === 'full' && (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground text-center">
+                The auction is currently at full capacity. Please wait for a spot to open up.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -63,9 +149,16 @@ export function AudienceScreen() {
           <h2 className="text-3xl font-bold text-foreground">Live Auction View</h2>
           <p className="text-muted-foreground mt-1">Watch the auction unfold in real-time</p>
         </div>
-        <Badge variant="default" className="animate-pulse">
-          LIVE
-        </Badge>
+        <div className="flex items-center gap-3">
+          {capacityData && (
+            <Badge variant="secondary" className="text-sm">
+              Audience: {Number(capacityData.currentCount)}/13
+            </Badge>
+          )}
+          <Badge variant="default" className="animate-pulse">
+            LIVE
+          </Badge>
+        </div>
       </div>
 
       {/* Current Auction Round */}

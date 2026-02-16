@@ -1,37 +1,69 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T14:49:52.792Z",
-  "summary": "REQ-1 appears implemented (backend initializes bidder remainingAmount to 1_000). REQ-2 is partially evidenced: rupee formatter and bid parsing changes are present, and Setup/Results/guards updates are shown; however, evidence is missing for AuctionScreen rupee label/text updates and for the AudienceScreen rupee formatting requirement.",
+  "generatedAt": "2026-02-16T14:58:20.025Z",
+  "summary": "Core audience limit/capacity plumbing was added on both backend and frontend, including join/leave hooks, periodic capacity polling, and an error UI. However, the backend does not track unique principals (so the limit is not truly “13 concurrent unique audience members”), the join is not idempotent per principal, the backend error does not clearly indicate the limit “13”, and audience state is not reset when a new auction starts. The frontend unmount leave is also likely ineffective due to a stale closure.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "AuctionScreen UI text reflects rupees (e.g., 'Bid Amount (₹)' instead of 'Bid Amount (CR)'), and bidder remaining/spent displays show ₹ values.",
-      "reason": "AuctionScreen.tsx changes show bid parsing no longer scales by 1_000_000_000_000 and uses formatAmount, but the provided truncated diff does not include the relevant UI label/text strings or the budget/spent display rendering to confirm they were updated from 'CR' to '₹'.",
+      "id": "REQ-1",
+      "requirement": "Enforce a limit of 13 concurrent unique audience principals server-side; re-joining from the same principal must be idempotent and not consume an additional slot; on the 14th unique principal, reject with a clear error indicating the limit (13).",
+      "reason": "Backend only increments/decrements a numeric counter with no per-principal tracking, so the same principal can consume multiple slots by calling join repeatedly, and leave can reduce count even if caller never joined. Also, the trap message for full audience does not mention the limit value “13”.",
       "evidence": [
-        "frontend/src/components/auction/AuctionScreen.tsx (truncated)"
+        "backend/main.mo: joinAudience increments currentAudienceCount without storing caller; no data structure keyed by principal",
+        "backend/main.mo: leaveAudience decrements currentAudienceCount without checking caller membership",
+        "backend/main.mo: Runtime.trap(\"Audience is at maximum capacity\") does not indicate \"(13)\""
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "Audience view (frontend/src/components/auction/AudienceScreen.tsx) shows highest bid and budgets formatted as ₹ via the updated formatter.",
-      "reason": "No diff content for AudienceScreen.tsx is provided among the modified files, so there is no direct evidence that the audience view was updated to use the rupee formatter.",
+      "requirement": "Audience presence state resets appropriately when a new auction is started so stale audience members from a prior auction do not keep occupying slots.",
+      "reason": "startNewAuctionWithSecretKey sets isAuctionActive := true but does not clear/reset currentAudienceCount (nor any audience member list, since none exists).",
       "evidence": [
-        "file-diff MODIFIED FILES list (AudienceScreen not shown)",
-        "frontend-file-summaries.txt (mentions AudienceScreen, but does not provide code evidence)"
+        "backend/main.mo: startNewAuctionWithSecretKey sets isAuctionActive := true but does not modify currentAudienceCount"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Audience screen leaves on unmount (best-effort).",
+      "reason": "The cleanup function captures the initial value of hasJoined due to an empty dependency array; if join succeeds after mount, hasJoined in the cleanup closure remains false, so leaveAudience.mutate() will not run on unmount.",
+      "evidence": [
+        "frontend/src/components/auction/AudienceScreen.tsx: useEffect([]) cleanup checks `if (hasJoined)` but hasJoined is state updated after mount; deps are [] with eslint-disable"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.62,
+  "hallucinated_features": [
+    {
+      "description": "Added backend migration scaffolding (backend/migration.mo and `with migration = Migration.run`).",
+      "reason": "Not requested by any requirement; additionally, the constraint emphasized keeping backend as a single Motoko actor in backend/main.mo, and introducing a new backend module/file is outside the requested scope.",
+      "evidence": [
+        "backend/migration.mo (new file)",
+        "backend/main.mo: `import Migration \"migration\"; (with migration = Migration.run)`"
+      ]
+    },
+    {
+      "description": "Backend blocks joining unless `isAuctionActive` is true and returns/uses capacity statuses like \"waiting\".",
+      "reason": "REQs specify enforcing a 13-person limit and presence tracking APIs, but do not require preventing joining before the auction starts or introducing an auction-active gating behavior.",
+      "evidence": [
+        "backend/main.mo: joinAudience traps with \"Auction not started\" when isAuctionActive is false",
+        "backend/main.mo: checkAudienceCapacity returns status = \"waiting\" and message about auction not started"
+      ]
+    },
+    {
+      "description": "Frontend/backend error normalization includes unrelated typo/wording transformations (e.g., replacing \"players\" with \"bidders\").",
+      "reason": "Not part of audience-limit requirements; adds extra behavior beyond requested audience error handling.",
+      "evidence": [
+        "frontend/src/utils/backendErrors.ts: `.replace(/\\bplayers\\b/gi, 'bidders')`"
+      ]
+    }
+  ],
+  "confidence": 0.78,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/auction/AuctionScreen.tsx",
-    "frontend/src/components/auction/ResultsScreen.tsx",
-    "frontend/src/components/auction/SetupScreen.tsx",
-    "frontend/src/components/auction/guards.ts",
-    "frontend/src/utils/format.ts",
+    "frontend/src/components/auction/AudienceScreen.tsx",
+    "frontend/src/hooks/useAuctionQueries.ts",
+    "frontend/src/utils/backendErrors.ts",
     "project_state.json"
   ]
 }

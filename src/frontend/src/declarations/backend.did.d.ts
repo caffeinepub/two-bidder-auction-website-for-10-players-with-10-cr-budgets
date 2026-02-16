@@ -26,6 +26,12 @@ export interface AuctionState {
   'inProgress' : boolean,
   'winners' : Array<PlayerState>,
 }
+export interface AudienceLimit {
+  'status' : string,
+  'maxCapacity' : bigint,
+  'currentCount' : bigint,
+  'message' : string,
+}
 export interface BidderState {
   'remainingAmount' : bigint,
   'name' : string,
@@ -39,7 +45,10 @@ export interface PlayerState {
 export interface RoundBidResult { 'bid' : AuctionBid, 'state' : AuctionState }
 export interface _SERVICE {
   'bidPlayer' : ActorMethod<[AuctionBid, string], RoundBidResult>,
+  'checkAudienceCapacity' : ActorMethod<[], AudienceLimit>,
   'getAuctionState' : ActorMethod<[], AuctionState>,
+  'joinAudience' : ActorMethod<[], boolean>,
+  'leaveAudience' : ActorMethod<[], boolean>,
   'sellPlayer' : ActorMethod<[string], AuctionState>,
   'startAuction' : ActorMethod<[string], AuctionState>,
   'startNewAuctionWithSecretKey' : ActorMethod<

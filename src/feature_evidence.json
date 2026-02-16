@@ -2,14 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-all-frontend-currency-formatting-labels-and-bid-parsing-so-amounts-are-treated-and-displayed-as-rupees-rather-than-crores-cr-including-budget-spent-highest-bid-bid-input-and-results-tables",
-      "featureTitle": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
+      "featureId": "feature-implement-an-audience-participant-limit-of-13-concurrent-audience-members-for-the-audience-screen-enforced-by-the-backend-so-it-cannot-be-bypassed-from-the-frontend",
+      "featureTitle": "Implement an audience participant limit of 13 concurrent audience members for the Audience screen, enforced by the backend so it cannot be bypassed from the frontend.",
       "files": [
-        "frontend/src/components/auction/AuctionScreen.tsx",
-        "frontend/src/components/auction/ResultsScreen.tsx",
-        "frontend/src/components/auction/SetupScreen.tsx",
-        "frontend/src/components/auction/guards.ts",
-        "frontend/src/utils/format.ts"
+        "frontend/src/components/auction/AudienceScreen.tsx",
+        "frontend/src/hooks/useAuctionQueries.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -19,7 +16,45 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-audience-screen-ui-to-attempt-to-join-on-mount-and-leave-on-unmount-best-effort-and-show-an-english-user-facing-error-state-when-the-audience-limit-is-reached-e-g-audience-limit-reached-13-please-try-again-later",
+      "featureTitle": "Update the Audience screen UI to attempt to join on mount and leave on unmount (best-effort), and show an English user-facing error state when the audience limit is reached (e.g., 'Audience limit reached (13). Please try again later.').",
+      "files": [
+        "frontend/src/components/auction/AudienceScreen.tsx",
+        "frontend/src/utils/backendErrors.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-expose-the-current-audience-count-in-the-audience-screen-and-or-header-area-using-the-new-backend-query-so-viewers-can-see-how-many-audience-members-are-currently-connected-out-of-13",
+      "featureTitle": "Expose the current audience count in the Audience screen (and/or header area) using the new backend query so viewers can see how many audience members are currently connected out of 13.",
+      "files": [
+        "frontend/src/components/auction/AudienceScreen.tsx",
+        "frontend/src/hooks/useAuctionQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

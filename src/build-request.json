@@ -1,59 +1,99 @@
 {
   "kind": "build_request",
-  "title": "Convert bidder budget and bidding amounts to ₹1000 rupees",
+  "title": "Add audience live call participant limit of 13",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Change the auction's initial bidder budget from the current large CR-based amount to exactly 1000 rupees per bidder for newly created auctions.",
-      "target": "backend",
+      "text": "Implement an audience participant limit of 13 concurrent audience members for the Audience screen, enforced by the backend so it cannot be bypassed from the frontend.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "The amount which is given to bidders can you convert it into 1000 rupees"
+          "Also add audience live call limit only of 13"
         ]
       },
       "acceptanceCriteria": [
-        "In backend/main.mo, startNewAuctionWithSecretKey initializes each bidder.remainingAmount to 1000 (Nat) instead of 10_000_000_000_000.",
-        "Starting a new auction results in both bidders having remainingAmount == 1000 when getAuctionState is called."
+        "When a 14th unique audience principal attempts to join, the backend rejects the request with a clear error message indicating the audience limit (13) has been reached.",
+        "The limit is enforced server-side (Motoko), not only via UI checks.",
+        "Re-joining from the same principal does not consume an additional slot (idempotent join)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
-      "target": "frontend",
+      "text": "Add backend APIs to support audience presence tracking: a method to join the audience, a method to leave the audience, and a query method to fetch current audience count (and/or list) needed by the UI.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "The amount which is given to bidders can you convert it into 1000 rupees"
+          "Also add audience live call limit only of 13"
         ]
       },
       "acceptanceCriteria": [
-        "frontend/src/utils/format.ts formats bigint amounts as rupees with a ₹ prefix (no CR conversion, no 1_000_000_000_000 scaling).",
-        "frontend/src/components/auction/AuctionScreen.tsx no longer multiplies the entered bid amount by 1_000_000_000_000; the entered numeric value is interpreted as rupees and converted to bigint rupees.",
-        "AuctionScreen UI text reflects rupees (e.g., 'Bid Amount (₹)' instead of 'Bid Amount (CR)'), and bidder remaining/spent displays show ₹ values.",
-        "frontend/src/components/auction/SetupScreen.tsx bidder section description is updated from '(10 CR each)' to '(₹1000 each)'.",
-        "frontend/src/components/auction/ResultsScreen.tsx spent calculation is updated to subtract from a single shared initial budget constant of 1000n (not 10_000_000_000_000n), and all displayed prices are formatted as ₹.",
-        "frontend/src/components/auction/guards.ts validation messages that currently mention 'CR' are updated to mention rupees and use the same ₹ formatting approach as the rest of the app.",
-        "Audience view (frontend/src/components/auction/AudienceScreen.tsx) shows highest bid and budgets formatted as ₹ via the updated formatter."
+        "Backend exposes callable methods for join and leave and a query for current audience size.",
+        "Audience state resets appropriately when a new auction is started (so stale audience members from a prior auction do not keep occupying slots)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Update the Audience screen UI to attempt to join on mount and leave on unmount (best-effort), and show an English user-facing error state when the audience limit is reached (e.g., 'Audience limit reached (13). Please try again later.').",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Also add audience live call limit only of 13"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Opening the Audience screen triggers a join call; navigating away triggers a leave call.",
+        "If join fails due to the limit, the Audience screen shows a clear error message and does not continue polling/visualizing live auction data as if joined successfully.",
+        "If join succeeds, the Audience screen continues to function normally (polling every ~2 seconds as it does today)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Expose the current audience count in the Audience screen (and/or header area) using the new backend query so viewers can see how many audience members are currently connected out of 13.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Also add audience live call limit only of 13"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Audience screen displays a count formatted like 'Audience: X/13' (English).",
+        "The displayed count updates periodically (can reuse the existing polling cadence)."
       ]
     }
   ],
   "constraints": [
-    "Respect the single-actor backend architecture; keep all Motoko logic in backend/main.mo.",
-    "Do not edit files under frontend/src/components/ui or any paths listed as immutable (e.g., frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/main.tsx)."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit files under frontend/src/components/ui or any paths listed as immutable in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Do not expose or reveal the auction secret key in any UI or API.",
-    "Do not add third-party payment, currency conversion APIs, or external data sources.",
-    "Do not retroactively migrate/convert existing in-progress auction state amounts unless explicitly requested."
+    "Implementing real-time communication (WebSockets) or actual live audio/video calling.",
+    "Adding third-party authentication beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

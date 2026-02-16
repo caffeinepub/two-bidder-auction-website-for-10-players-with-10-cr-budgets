@@ -1,55 +1,77 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T14:49:52.795Z",
+  "generatedAt": "2026-02-16T14:58:20.027Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 1,
+    "total": 4,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Change the auction's initial bidder budget from the current large CR-based amount to exactly 1000 rupees per bidder for newly created auctions.",
+        "summary": "Implement an audience participant limit of 13 concurrent audience members for the Audience screen, enforced by the backend so it cannot be bypassed from the frontend.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/components/auction/AudienceScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/components/auction/AudienceScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Add backend APIs to support audience presence tracking: a method to join the audience, a method to leave the audience, and a query method to fetch current audience count (and/or list) needed by the UI.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-2",
-        "summary": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
+        "id": "REQ-3",
+        "summary": "Update the Audience screen UI to attempt to join on mount and leave on unmount (best-effort), and show an English user-facing error state when the audience limit is reached (e.g., 'Audience limit reached (13). Please try again later.').",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/format.ts",
-          "frontend/src/components/auction/AuctionScreen.tsx",
-          "frontend/src/components/auction/SetupScreen.tsx",
-          "frontend/src/components/auction/ResultsScreen.tsx",
-          "frontend/src/components/auction/guards.ts",
+          "frontend/src/components/auction/AudienceScreen.tsx",
+          "frontend/src/utils/backendErrors.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/auction/AudienceScreen.tsx",
+          "frontend/src/utils/backendErrors.ts"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Expose the current audience count in the Audience screen (and/or header area) using the new backend query so viewers can see how many audience members are currently connected out of 13.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useAuctionQueries.ts",
           "frontend/src/components/auction/AudienceScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/format.ts",
-          "frontend/src/components/auction/AuctionScreen.tsx",
-          "frontend/src/components/auction/SetupScreen.tsx",
-          "frontend/src/components/auction/ResultsScreen.tsx",
-          "frontend/src/components/auction/guards.ts"
+          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/components/auction/AudienceScreen.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/auction/AuctionScreen.tsx",
-    "frontend/src/components/auction/ResultsScreen.tsx",
-    "frontend/src/components/auction/SetupScreen.tsx",
-    "frontend/src/components/auction/guards.ts",
-    "frontend/src/utils/format.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/auction/AudienceScreen.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useAuctionQueries.ts",
+    "frontend/src/utils/backendErrors.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

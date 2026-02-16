@@ -32,6 +32,12 @@ export interface AuctionBid {
     amount: bigint;
     bidderName: string;
 }
+export interface AudienceLimit {
+    status: string;
+    maxCapacity: bigint;
+    currentCount: bigint;
+    message: string;
+}
 export interface PlayerState {
     boughtBy?: string;
     name: string;
@@ -39,7 +45,10 @@ export interface PlayerState {
 }
 export interface backendInterface {
     bidPlayer(bid: AuctionBid, providedKey: string): Promise<RoundBidResult>;
+    checkAudienceCapacity(): Promise<AudienceLimit>;
     getAuctionState(): Promise<AuctionState>;
+    joinAudience(): Promise<boolean>;
+    leaveAudience(): Promise<boolean>;
     sellPlayer(_playerName: string): Promise<AuctionState>;
     startAuction(_playerName: string): Promise<AuctionState>;
     startNewAuctionWithSecretKey(bidder1Name: string, bidder2Name: string, playerNames: Array<string>, newSecretKey: string): Promise<AuctionState>;

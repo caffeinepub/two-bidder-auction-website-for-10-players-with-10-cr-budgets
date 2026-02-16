@@ -1,57 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Add live audience (spectator) view for watching the auction in real time",
+  "title": "Convert bidder budget and bidding amounts to ₹1000 rupees",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-10",
-      "text": "Add an Audience (spectator) screen that lets viewers watch the auction live in a read-only mode, showing the current auctioned player, current highest bid and highest bidder, bidder remaining budgets, and the sold/unsold players list.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Change the auction's initial bidder budget from the current large CR-based amount to exactly 1000 rupees per bidder for newly created auctions.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-10"
+          "msg-1"
         ],
         "quotes": [
-          "Add one more details that audience can also see the auction live"
+          "The amount which is given to bidders can you convert it into 1000 rupees"
         ]
       },
       "acceptanceCriteria": [
-        "A new Audience screen exists and is reachable from the app navigation (e.g., a new 'Audience' tab).",
-        "The Audience screen renders the current player being auctioned (or a clear message when no round is active).",
-        "The Audience screen renders the current highest bid and highest bidder (or 'No bids yet' when appropriate).",
-        "The Audience screen renders bidder names and remaining budgets.",
-        "The Audience screen renders a players table/list with sold vs unsold status, sold price, and bought-by information.",
-        "The Audience screen does not render any controls that mutate state (no start auction, place bid, finalize sale actions).",
-        "All user-facing text on the Audience screen is in English."
+        "In backend/main.mo, startNewAuctionWithSecretKey initializes each bidder.remainingAmount to 1000 (Nat) instead of 10_000_000_000_000.",
+        "Starting a new auction results in both bidders having remainingAmount == 1000 when getAuctionState is called."
       ]
     },
     {
-      "id": "REQ-11",
-      "text": "Make the Audience (spectator) screen update automatically to reflect the live auction state by polling the existing backend auction state query on an interval.",
+      "id": "REQ-2",
+      "text": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-10"
+          "msg-1"
         ],
         "quotes": [
-          "Add one more details that audience can also see the auction live"
+          "The amount which is given to bidders can you convert it into 1000 rupees"
         ]
       },
       "acceptanceCriteria": [
-        "When the auction host performs actions (start auction, place bid, finalize sale) in another session/browser, the Audience screen updates automatically without a manual refresh.",
-        "Polling uses React Query (e.g., a query with a refetch interval) and does not introduce any WebSocket or real-time infrastructure.",
-        "Loading and error states are handled cleanly (e.g., spinner while loading; error alert if state cannot be fetched)."
+        "frontend/src/utils/format.ts formats bigint amounts as rupees with a ₹ prefix (no CR conversion, no 1_000_000_000_000 scaling).",
+        "frontend/src/components/auction/AuctionScreen.tsx no longer multiplies the entered bid amount by 1_000_000_000_000; the entered numeric value is interpreted as rupees and converted to bigint rupees.",
+        "AuctionScreen UI text reflects rupees (e.g., 'Bid Amount (₹)' instead of 'Bid Amount (CR)'), and bidder remaining/spent displays show ₹ values.",
+        "frontend/src/components/auction/SetupScreen.tsx bidder section description is updated from '(10 CR each)' to '(₹1000 each)'.",
+        "frontend/src/components/auction/ResultsScreen.tsx spent calculation is updated to subtract from a single shared initial budget constant of 1000n (not 10_000_000_000_000n), and all displayed prices are formatted as ₹.",
+        "frontend/src/components/auction/guards.ts validation messages that currently mention 'CR' are updated to mention rupees and use the same ₹ formatting approach as the rest of the app.",
+        "Audience view (frontend/src/components/auction/AudienceScreen.tsx) shows highest bid and budgets formatted as ₹ via the updated formatter."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files listed in SYSTEM_CONTEXT.frontend.immutablePaths.",
-    "Keep all backend logic in the single Motoko actor (backend/main.mo); do not introduce additional backend services."
+    "Respect the single-actor backend architecture; keep all Motoko logic in backend/main.mo.",
+    "Do not edit files under frontend/src/components/ui or any paths listed as immutable (e.g., frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/main.tsx)."
   ],
   "nonGoals": [
-    "Do not implement live chat.",
-    "Do not implement an auction host/admin role or permissions.",
-    "Do not add WebSocket-based real-time updates; polling is sufficient for 'live' viewing."
+    "Do not expose or reveal the auction secret key in any UI or API.",
+    "Do not add third-party payment, currency conversion APIs, or external data sources.",
+    "Do not retroactively migrate/convert existing in-progress auction state amounts unless explicitly requested."
   ],
   "imageRequirements": {
     "required": [],

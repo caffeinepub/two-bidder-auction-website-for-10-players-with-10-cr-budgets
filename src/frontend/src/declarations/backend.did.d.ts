@@ -38,12 +38,12 @@ export interface PlayerState {
 }
 export interface RoundBidResult { 'bid' : AuctionBid, 'state' : AuctionState }
 export interface _SERVICE {
-  'bidPlayer' : ActorMethod<[AuctionBid], RoundBidResult>,
+  'bidPlayer' : ActorMethod<[AuctionBid, string], RoundBidResult>,
   'getAuctionState' : ActorMethod<[], AuctionState>,
   'sellPlayer' : ActorMethod<[string], AuctionState>,
   'startAuction' : ActorMethod<[string], AuctionState>,
-  'startNewAuction' : ActorMethod<
-    [string, string, Array<string>],
+  'startNewAuctionWithSecretKey' : ActorMethod<
+    [string, string, Array<string>, string],
     AuctionState
   >,
 }

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Loader2, Trophy, RotateCcw, AlertCircle } from 'lucide-react';
 import { useAuctionState } from '../../hooks/useAuctionQueries';
-import { formatAmount } from '../../utils/format';
+import { formatAmount, INITIAL_BUDGET_RUPEES } from '../../utils/format';
 
 interface ResultsScreenProps {
   onReset: () => void;
@@ -65,7 +65,7 @@ export function ResultsScreen({ onReset }: ResultsScreenProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {auctionState.bidders.map((bidder) => {
           const roster = auctionState.players.filter((p) => p.boughtBy === bidder.name);
-          const totalSpent = 10_000_000_000_000n - bidder.remainingAmount;
+          const totalSpent = INITIAL_BUDGET_RUPEES - bidder.remainingAmount;
 
           return (
             <Card key={bidder.name} className="border-2">
@@ -172,4 +172,3 @@ export function ResultsScreen({ onReset }: ResultsScreenProps) {
     </div>
   );
 }
-

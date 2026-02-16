@@ -1,56 +1,50 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Live read-only Audience (spectator) view for the auction",
+  "title": "Switch auction UI from CR-scaled amounts to ₹ rupees (₹1000 budget)",
   "requirements": [
     {
-      "id": "REQ-10",
-      "summary": "Add a read-only Audience screen showing live auction status, bidder budgets, and sold/unsold players list, reachable from navigation.",
+      "id": "REQ-2",
+      "summary": "Update frontend formatting, labels, and bid parsing to treat all amounts as rupees (₹) with a ₹1000 initial budget baseline.",
       "acceptanceCriteria": [
-        "A new Audience screen exists and is reachable from the app navigation (e.g., a new 'Audience' tab).",
-        "The Audience screen renders the current player being auctioned (or a clear message when no round is active).",
-        "The Audience screen renders the current highest bid and highest bidder (or 'No bids yet' when appropriate).",
-        "The Audience screen renders bidder names and remaining budgets.",
-        "The Audience screen renders a players table/list with sold vs unsold status, sold price, and bought-by information.",
-        "The Audience screen does not render any controls that mutate state (no start auction, place bid, finalize sale actions).",
-        "All user-facing text on the Audience screen is in English."
+        "frontend/src/utils/format.ts formats bigint amounts as rupees with a ₹ prefix (no CR conversion, no 1_000_000_000_000 scaling).",
+        "frontend/src/components/auction/AuctionScreen.tsx no longer multiplies the entered bid amount by 1_000_000_000_000; the entered numeric value is interpreted as rupees and converted to bigint rupees.",
+        "AuctionScreen UI text reflects rupees (e.g., 'Bid Amount (₹)' instead of 'Bid Amount (CR)'), and bidder remaining/spent displays show ₹ values.",
+        "frontend/src/components/auction/SetupScreen.tsx bidder section description is updated from '(10 CR each)' to '(₹1000 each)'.",
+        "frontend/src/components/auction/ResultsScreen.tsx spent calculation is updated to subtract from a single shared initial budget constant of 1000n (not 10_000_000_000_000n), and all displayed prices are formatted as ₹.",
+        "frontend/src/components/auction/guards.ts validation messages that currently mention 'CR' are updated to mention rupees and use the same ₹ formatting approach as the rest of the app.",
+        "Audience view (frontend/src/components/auction/AudienceScreen.tsx) shows highest bid and budgets formatted as ₹ via the updated formatter."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/auction/AudienceScreen.tsx",
-          "operation": "create",
-          "description": "Create the read-only Audience (spectator) screen UI that renders: current auctioned player (or a clear 'no round active' message), highest bid + highest bidder (or 'No bids yet'), bidder names with remaining budgets, and a players table with sold/unsold status, sold price, and bought-by fields. Use shadcn-ui components (e.g., Card, Badge, Table, Alert) to match the existing app styling; verify the component's usage instructions before implementing."
+          "path": "frontend/src/utils/format.ts",
+          "operation": "modify",
+          "description": "Update formatAmount to display bigint values as rupees with a ₹ prefix and no CR scaling; introduce and export a shared INITIAL_BUDGET_RUPEES = 1000n constant for consistent 'spent' calculations across screens."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/auction/AuctionScreen.tsx",
           "operation": "modify",
-          "description": "Wire the new Audience screen into the app-level screen switcher by extending the Screen union to include 'audience' and rendering AudienceScreen when selected."
+          "description": "Interpret bid input as rupees (convert entered numeric value directly to bigint rupees without 1_000_000_000_000 multiplication), update bid amount label text to 'Bid Amount (₹)', and compute/display bidder 'Spent' using INITIAL_BUDGET_RUPEES - remainingAmount with rupee formatting."
         },
         {
-          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "path": "frontend/src/components/auction/SetupScreen.tsx",
           "operation": "modify",
-          "description": "Add an 'Audience' navigation item and extend the AppLayout prop types to include the new 'audience' screen so the Audience screen is reachable from the header navigation."
-        }
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "summary": "Make the Audience screen automatically refresh by polling auction state via React Query refetch interval, with clean loading and error UI.",
-      "acceptanceCriteria": [
-        "When the auction host performs actions (start auction, place bid, finalize sale) in another session/browser, the Audience screen updates automatically without a manual refresh.",
-        "Polling uses React Query (e.g., a query with a refetch interval) and does not introduce any WebSocket or real-time infrastructure.",
-        "Loading and error states are handled cleanly (e.g., spinner while loading; error alert if state cannot be fetched)."
-      ],
-      "file_operations": [
+          "description": "Update the bidders section description text from '(10 CR each)' to '(₹1000 each)' to match the rupee-based budget."
+        },
         {
-          "path": "frontend/src/hooks/useAuctionQueries.ts",
+          "path": "frontend/src/components/auction/ResultsScreen.tsx",
           "operation": "modify",
-          "description": "Extend the auction state query hook to support optional React Query settings (notably refetch interval) so the Audience screen can poll the existing backend auction state query on an interval without duplicating logic."
+          "description": "Update totalSpent computation to use INITIAL_BUDGET_RUPEES - remainingAmount instead of the prior CR-scaled constant, ensuring all displayed spending/remaining/price values continue to use the shared ₹ formatter."
+        },
+        {
+          "path": "frontend/src/components/auction/guards.ts",
+          "operation": "modify",
+          "description": "Replace CR-specific formatting and 'CR' wording in bid validation messages with rupee-aware wording and formatting by reusing the shared formatAmount utility (remove the local formatBigIntToCR helper)."
         },
         {
           "path": "frontend/src/components/auction/AudienceScreen.tsx",
           "operation": "modify",
-          "description": "Use the auction state React Query hook with a refetch interval to poll for live updates. Ensure the screen shows a clear loading indicator while fetching and a user-friendly error alert if the auction state cannot be fetched. Use shadcn-ui Alert (and existing Loader icon patterns) for consistent states; verify the component's usage instructions before implementing."
+          "description": "Confirm all displayed monetary values (highest bid, bidder budgets, sold prices) are presented via the updated rupee formatter; adjust any residual CR text if present."
         }
       ]
     }

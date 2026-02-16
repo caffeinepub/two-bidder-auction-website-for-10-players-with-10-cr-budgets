@@ -1,54 +1,55 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T14:03:26.487Z",
+  "generatedAt": "2026-02-16T14:49:52.795Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 2,
-    "implemented": 2,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-10",
-        "summary": "Add an Audience (spectator) screen that lets viewers watch the auction live in a read-only mode, showing the current auctioned player, current highest bid and highest bidder, bidder remaining budgets, and the sold/unsold players list.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/auction/AudienceScreen.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/layout/AppLayout.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/auction/AudienceScreen.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/layout/AppLayout.tsx"
-        ]
+        "id": "REQ-1",
+        "summary": "Change the auction's initial bidder budget from the current large CR-based amount to exactly 1000 rupees per bidder for newly created auctions.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
-        "id": "REQ-11",
-        "summary": "Make the Audience (spectator) screen update automatically to reflect the live auction state by polling the existing backend auction state query on an interval.",
+        "id": "REQ-2",
+        "summary": "Update all frontend currency formatting, labels, and bid parsing so amounts are treated and displayed as rupees (₹) rather than crores (CR), including budget, spent, highest bid, bid input, and results tables.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useAuctionQueries.ts",
+          "frontend/src/utils/format.ts",
+          "frontend/src/components/auction/AuctionScreen.tsx",
+          "frontend/src/components/auction/SetupScreen.tsx",
+          "frontend/src/components/auction/ResultsScreen.tsx",
+          "frontend/src/components/auction/guards.ts",
           "frontend/src/components/auction/AudienceScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useAuctionQueries.ts",
-          "frontend/src/components/auction/AudienceScreen.tsx"
+          "frontend/src/utils/format.ts",
+          "frontend/src/components/auction/AuctionScreen.tsx",
+          "frontend/src/components/auction/SetupScreen.tsx",
+          "frontend/src/components/auction/ResultsScreen.tsx",
+          "frontend/src/components/auction/guards.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/auction/AudienceScreen.tsx",
-    "frontend/src/components/layout/AppLayout.tsx",
-    "frontend/src/hooks/useAuctionQueries.ts",
+    "frontend/src/components/auction/AuctionScreen.tsx",
+    "frontend/src/components/auction/ResultsScreen.tsx",
+    "frontend/src/components/auction/SetupScreen.tsx",
+    "frontend/src/components/auction/guards.ts",
+    "frontend/src/utils/format.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

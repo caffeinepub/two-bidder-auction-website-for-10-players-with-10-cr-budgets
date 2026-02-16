@@ -120,26 +120,26 @@ export interface PlayerState {
     price?: bigint;
 }
 export interface backendInterface {
-    bidPlayer(bid: AuctionBid): Promise<RoundBidResult>;
+    bidPlayer(bid: AuctionBid, providedKey: string): Promise<RoundBidResult>;
     getAuctionState(): Promise<AuctionState>;
     sellPlayer(_playerName: string): Promise<AuctionState>;
     startAuction(_playerName: string): Promise<AuctionState>;
-    startNewAuction(bidder1Name: string, bidder2Name: string, playerNames: Array<string>): Promise<AuctionState>;
+    startNewAuctionWithSecretKey(bidder1Name: string, bidder2Name: string, playerNames: Array<string>, newSecretKey: string): Promise<AuctionState>;
 }
 import type { AuctionBid as _AuctionBid, AuctionState as _AuctionState, BidderState as _BidderState, PlayerState as _PlayerState, RoundBidResult as _RoundBidResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
-    async bidPlayer(arg0: AuctionBid): Promise<RoundBidResult> {
+    async bidPlayer(arg0: AuctionBid, arg1: string): Promise<RoundBidResult> {
         if (this.processError) {
             try {
-                const result = await this.actor.bidPlayer(to_candid_AuctionBid_n1(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.bidPlayer(to_candid_AuctionBid_n1(this._uploadFile, this._downloadFile, arg0), arg1);
                 return from_candid_RoundBidResult_n3(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.bidPlayer(to_candid_AuctionBid_n1(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.bidPlayer(to_candid_AuctionBid_n1(this._uploadFile, this._downloadFile, arg0), arg1);
             return from_candid_RoundBidResult_n3(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -185,17 +185,17 @@ export class Backend implements backendInterface {
             return from_candid_AuctionState_n8(this._uploadFile, this._downloadFile, result);
         }
     }
-    async startNewAuction(arg0: string, arg1: string, arg2: Array<string>): Promise<AuctionState> {
+    async startNewAuctionWithSecretKey(arg0: string, arg1: string, arg2: Array<string>, arg3: string): Promise<AuctionState> {
         if (this.processError) {
             try {
-                const result = await this.actor.startNewAuction(arg0, arg1, arg2);
+                const result = await this.actor.startNewAuctionWithSecretKey(arg0, arg1, arg2, arg3);
                 return from_candid_AuctionState_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.startNewAuction(arg0, arg1, arg2);
+            const result = await this.actor.startNewAuctionWithSecretKey(arg0, arg1, arg2, arg3);
             return from_candid_AuctionState_n8(this._uploadFile, this._downloadFile, result);
         }
     }

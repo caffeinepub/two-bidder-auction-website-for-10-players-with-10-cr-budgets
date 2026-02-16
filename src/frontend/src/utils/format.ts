@@ -1,10 +1,15 @@
 /**
- * Format bigint amount to CR (crores) display format
- * Backend stores amounts as: 1 CR = 1_000_000_000_000
+ * Initial budget for each bidder in rupees
+ */
+export const INITIAL_BUDGET_RUPEES = 1000n;
+
+/**
+ * Format bigint amount to rupees display format
+ * Backend stores amounts directly as rupees (1 rupee = 1)
  */
 export function formatAmount(amount: bigint): string {
-  const cr = Number(amount) / 1_000_000_000_000;
-  return `${cr.toFixed(2)} CR`;
+  const rupees = Number(amount);
+  return `₹${rupees.toLocaleString()}`;
 }
 
 /**
@@ -25,4 +30,3 @@ export function getPlayerStatus(
 export function getHighestBidderDisplay(highestBidder?: string): string {
   return highestBidder || 'No bids yet';
 }
-

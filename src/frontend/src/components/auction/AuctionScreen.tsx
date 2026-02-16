@@ -13,21 +13,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Loader2, Gavel, TrendingUp, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Loader2, Gavel, TrendingUp, AlertCircle, CheckCircle2, Clock, Key } from 'lucide-react';
 import {
   useAuctionState,
   useStartAuction,
   usePlaceBid,
   useSellPlayer,
 } from '../../hooks/useAuctionQueries';
-import { formatAmount } from '../../utils/format';
+import { formatAmount, INITIAL_BUDGET_RUPEES } from '../../utils/format';
 import { validateBid } from './guards';
 
 interface AuctionScreenProps {
   onViewResults: () => void;
+  secretKey?: string;
 }
 
-export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
+export function AuctionScreen({ onViewResults, secretKey: initialSecretKey }: AuctionScreenProps) {
   const { data: auctionState, isLoading, error } = useAuctionState();
   const startAuctionMutation = useStartAuction();
   const placeBidMutation = usePlaceBid();
@@ -36,6 +37,7 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
   const [bidAmount, setBidAmount] = useState('');
   const [selectedBidder, setSelectedBidder] = useState<string>('');
+  const [secretKey, setSecretKey] = useState(initialSecretKey || '');
 
   if (isLoading) {
     return (
@@ -83,10 +85,10 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
 
   const handlePlaceBid = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentPlayer || !selectedBidder || !bidAmount) return;
+    if (!currentPlayer || !selectedBidder || !bidAmount || !secretKey) return;
 
     const bidAmountNum = parseFloat(bidAmount);
-    const bidAmountBigInt = BigInt(Math.round(bidAmountNum * 1_000_000_000_000));
+    const bidAmountBigInt = BigInt(Math.round(bidAmountNum));
 
     const bidder = auctionState.bidders.find((b) => b.name === selectedBidder);
     if (!bidder) return;
@@ -101,6 +103,7 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
         playerName: currentPlayer,
         bidderName: selectedBidder,
         amount: bidAmountBigInt,
+        secretKey: secretKey,
       });
       setBidAmount('');
     } catch (error) {
@@ -119,11 +122,13 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
   };
 
   const bidAmountNum = bidAmount ? parseFloat(bidAmount) : 0;
-  const bidAmountBigInt = BigInt(Math.round(bidAmountNum * 1_000_000_000_000));
+  const bidAmountBigInt = BigInt(Math.round(bidAmountNum));
   const selectedBidderData = auctionState.bidders.find((b) => b.name === selectedBidder);
   const bidValidation = selectedBidderData
     ? validateBid(bidAmountBigInt, highestBid, selectedBidderData.remainingAmount)
     : { valid: false, message: 'Select a bidder' };
+
+  const canPlaceBid = bidValidation.valid && secretKey.trim() !== '';
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -145,7 +150,7 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Spent</span>
                   <span className="font-medium">
-                    {formatAmount(10_000_000_000_000n - bidder.remainingAmount)}
+                    {formatAmount(INITIAL_BUDGET_RUPEES - bidder.remainingAmount)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
@@ -192,7 +197,7 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
 
               {/* Place Bid Form */}
               <form onSubmit={handlePlaceBid} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="bidder">Select Bidder</Label>
                     <select
@@ -210,18 +215,41 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bidAmount">Bid Amount (CR)</Label>
+                    <Label htmlFor="bidAmount">Bid Amount (₹)</Label>
                     <Input
                       id="bidAmount"
                       type="number"
-                      step="0.01"
+                      step="1"
                       min="0"
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
                       placeholder="Enter bid amount"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="secretKeyInput" className="flex items-center gap-2">
+                      <Key className="h-4 w-4 text-warning" />
+                      Secret Key
+                    </Label>
+                    <Input
+                      id="secretKeyInput"
+                      type="password"
+                      value={secretKey}
+                      onChange={(e) => setSecretKey(e.target.value)}
+                      placeholder="Enter secret key"
+                      className="font-medium"
+                    />
+                  </div>
                 </div>
+
+                {!secretKey.trim() && (
+                  <Alert>
+                    <Key className="h-4 w-4" />
+                    <AlertDescription>
+                      Secret key is required to place bids. Enter the key provided by the auctioneer.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 {!bidValidation.valid && bidAmount && selectedBidder && (
                   <Alert variant="destructive">
@@ -245,7 +273,7 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
                   <Button
                     type="submit"
                     disabled={
-                      !bidValidation.valid || placeBidMutation.isPending || !bidAmount || !selectedBidder
+                      !canPlaceBid || placeBidMutation.isPending
                     }
                     className="flex-1"
                   >
@@ -263,10 +291,10 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
                   </Button>
                   <Button
                     type="button"
-                    variant="default"
+                    variant="outline"
                     onClick={handleSellPlayer}
                     disabled={highestBid === 0n || sellPlayerMutation.isPending}
-                    className="flex-1 bg-success hover:bg-success/90 text-success-foreground"
+                    className="flex-1"
                   >
                     {sellPlayerMutation.isPending ? (
                       <>
@@ -296,94 +324,87 @@ export function AuctionScreen({ onViewResults }: AuctionScreenProps) {
             </>
           ) : (
             <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No player currently being auctioned</p>
-              <p className="text-sm text-muted-foreground">
-                Select a player from the list below to start
-              </p>
+              <p className="text-muted-foreground mb-4">No active auction. Select a player to start.</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Players List */}
+      {/* Available Players */}
       <Card>
         <CardHeader>
-          <CardTitle>Players</CardTitle>
+          <CardTitle>Available Players</CardTitle>
           <CardDescription>
-            {unsoldPlayers.length} unsold • {auctionState.players.length - unsoldPlayers.length} sold
+            {unsoldPlayers.length} player{unsoldPlayers.length !== 1 ? 's' : ''} remaining
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {startAuctionMutation.isError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                {startAuctionMutation.error instanceof Error
-                  ? startAuctionMutation.error.message
-                  : 'Failed to start auction. Please try again.'}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Player Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Bought By</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {auctionState.players.map((player) => (
-                <TableRow key={player.name}>
-                  <TableCell className="font-medium">{player.name}</TableCell>
-                  <TableCell>
-                    {player.boughtBy ? (
-                      <Badge className="bg-success text-success-foreground">Sold</Badge>
-                    ) : player.name === currentPlayer ? (
-                      <Badge variant="outline" className="border-accent text-accent">
-                        Live
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">Unsold</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {player.price ? formatAmount(player.price) : '-'}
-                  </TableCell>
-                  <TableCell>{player.boughtBy || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    {!player.boughtBy && player.name !== currentPlayer && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStartAuction(player.name)}
-                        disabled={!!currentPlayer || startAuctionMutation.isPending}
-                      >
-                        {startAuctionMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+          {unsoldPlayers.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Player Name</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {unsoldPlayers.map((player) => (
+                    <TableRow key={player.name}>
+                      <TableCell className="font-medium">{player.name}</TableCell>
+                      <TableCell>
+                        {currentPlayer === player.name ? (
+                          <Badge variant="default" className="bg-accent">
+                            <Clock className="mr-1 h-3 w-3" />
+                            On Auction
+                          </Badge>
                         ) : (
-                          'Start Auction'
+                          <Badge variant="outline">Available</Badge>
                         )}
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleStartAuction(player.name)}
+                          disabled={
+                            !!currentPlayer ||
+                            startAuctionMutation.isPending
+                          }
+                        >
+                          {startAuctionMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            'Start Auction'
+                          )}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
+              <p className="text-lg font-medium mb-2">All Players Sold!</p>
+              <p className="text-muted-foreground mb-4">The auction is complete.</p>
+              <Button onClick={onViewResults}>View Final Results</Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* View Results Button */}
-      {unsoldPlayers.length === 0 && (
-        <div className="flex justify-center">
-          <Button size="lg" onClick={onViewResults} className="min-w-[200px]">
-            View Final Results
-          </Button>
-        </div>
+      {startAuctionMutation.isError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {startAuctionMutation.error instanceof Error
+              ? startAuctionMutation.error.message
+              : 'Failed to start auction. Please try again.'}
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );

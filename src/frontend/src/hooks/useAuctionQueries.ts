@@ -28,14 +28,16 @@ export function useInitializeAuction() {
       bidder1Name,
       bidder2Name,
       playerNames,
+      secretKey,
     }: {
       bidder1Name: string;
       bidder2Name: string;
       playerNames: string[];
+      secretKey: string;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       try {
-        return await actor.startNewAuction(bidder1Name, bidder2Name, playerNames);
+        return await actor.startNewAuctionWithSecretKey(bidder1Name, bidder2Name, playerNames, secretKey);
       } catch (error) {
         throw new Error(normalizeBackendError(error));
       }
@@ -74,10 +76,12 @@ export function usePlaceBid() {
       playerName,
       bidderName,
       amount,
+      secretKey,
     }: {
       playerName: string;
       bidderName: string;
       amount: bigint;
+      secretKey: string;
     }) => {
       if (!actor) throw new Error('Actor not initialized');
       const bid: AuctionBid = {
@@ -86,7 +90,7 @@ export function usePlaceBid() {
         amount,
       };
       try {
-        return await actor.bidPlayer(bid);
+        return await actor.bidPlayer(bid, secretKey);
       } catch (error) {
         throw new Error(normalizeBackendError(error));
       }

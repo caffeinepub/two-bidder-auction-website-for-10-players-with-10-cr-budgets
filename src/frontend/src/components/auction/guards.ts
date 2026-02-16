@@ -1,3 +1,5 @@
+import { formatAmount } from '../../utils/format';
+
 export interface ValidationResult {
   valid: boolean;
   message: string;
@@ -6,7 +8,8 @@ export interface ValidationResult {
 export function validateSetup(
   bidder1: string,
   bidder2: string,
-  players: string[]
+  players: string[],
+  secretKey: string
 ): ValidationResult {
   // Check bidder names
   if (!bidder1.trim()) {
@@ -36,6 +39,11 @@ export function validateSetup(
     return { valid: false, message: 'Player names must be unique' };
   }
 
+  // Check secret key
+  if (!secretKey.trim()) {
+    return { valid: false, message: 'Secret key is required' };
+  }
+
   return { valid: true, message: '' };
 }
 
@@ -51,22 +59,16 @@ export function validateBid(
   if (bidAmount <= currentHighestBid) {
     return {
       valid: false,
-      message: `Bid must be higher than current highest bid (${formatBigIntToCR(currentHighestBid)})`,
+      message: `Bid must be higher than current highest bid (${formatAmount(currentHighestBid)})`,
     };
   }
 
   if (bidAmount > remainingBudget) {
     return {
       valid: false,
-      message: `Bid exceeds remaining budget (${formatBigIntToCR(remainingBudget)} available)`,
+      message: `Bid exceeds remaining budget (${formatAmount(remainingBudget)} available)`,
     };
   }
 
   return { valid: true, message: '' };
 }
-
-function formatBigIntToCR(amount: bigint): string {
-  const cr = Number(amount) / 1_000_000_000_000;
-  return `${cr.toFixed(2)} CR`;
-}
-

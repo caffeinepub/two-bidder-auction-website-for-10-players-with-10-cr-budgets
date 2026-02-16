@@ -38,9 +38,9 @@ export interface PlayerState {
     price?: bigint;
 }
 export interface backendInterface {
-    bidPlayer(bid: AuctionBid): Promise<RoundBidResult>;
+    bidPlayer(bid: AuctionBid, providedKey: string): Promise<RoundBidResult>;
     getAuctionState(): Promise<AuctionState>;
     sellPlayer(_playerName: string): Promise<AuctionState>;
     startAuction(_playerName: string): Promise<AuctionState>;
-    startNewAuction(bidder1Name: string, bidder2Name: string, playerNames: Array<string>): Promise<AuctionState>;
+    startNewAuctionWithSecretKey(bidder1Name: string, bidder2Name: string, playerNames: Array<string>, newSecretKey: string): Promise<AuctionState>;
 }

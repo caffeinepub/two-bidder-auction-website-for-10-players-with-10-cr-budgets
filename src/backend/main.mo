@@ -46,6 +46,8 @@ actor {
     boughtBy : ?Text;
   };
 
+  var secretKey : ?Text = null;
+
   var auctionState = {
     players = [] : [PlayerState];
     winners = [] : [PlayerState];
@@ -58,8 +60,14 @@ actor {
   } : AuctionState;
 
   // Game state
+  let maxBudget = 1_000; // In rupees (1 CR = 100 rupees)
 
-  public shared ({ caller }) func startNewAuction(bidder1Name : Text, bidder2Name : Text, playerNames : [Text]) : async AuctionState {
+  public shared ({ caller }) func startNewAuctionWithSecretKey(
+    bidder1Name : Text,
+    bidder2Name : Text,
+    playerNames : [Text],
+    newSecretKey : Text,
+  ) : async AuctionState {
     if (playerNames.size() != 10) {
       Runtime.trap("Must have exactly 10 players");
     };
@@ -70,8 +78,8 @@ actor {
       players = playersMap;
       winners = [];
       bidders = [
-        { name = bidder1Name; remainingAmount = 10_000_000_000_000; isPlaying = true },
-        { name = bidder2Name; remainingAmount = 10_000_000_000_000; isPlaying = true },
+        { name = bidder1Name; remainingAmount = maxBudget; isPlaying = true },
+        { name = bidder2Name; remainingAmount = maxBudget; isPlaying = true },
       ];
       currentAuctionedPlayer = null;
       inProgress = true;
@@ -79,6 +87,7 @@ actor {
       highestBidder = null;
       roundStartTime = 0;
     };
+    secretKey := ?newSecretKey;
     auctionState;
   };
 
@@ -163,7 +172,16 @@ actor {
     auctionState;
   };
 
-  public shared ({ caller }) func bidPlayer(bid : AuctionBid) : async RoundBidResult {
+  public shared ({ caller }) func bidPlayer(bid : AuctionBid, providedKey : Text) : async RoundBidResult {
+    switch (secretKey) {
+      case (null) { Runtime.trap("Auction not started") };
+      case (?key) {
+        if (not Text.equal(key, providedKey)) {
+          Runtime.trap("Incorrect provided key. Please check with the auctioneer");
+        };
+      };
+    };
+
     switch (auctionState.currentAuctionedPlayer) {
       case (null) {
         Runtime.trap("There is no running auction for any player");
@@ -258,4 +276,3 @@ actor {
     };
   };
 };
-

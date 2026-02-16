@@ -9,17 +9,31 @@ type Screen = 'setup' | 'auction' | 'results' | 'audience';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('setup');
+  const [secretKey, setSecretKey] = useState<string>('');
+
+  const handleStartAuction = (key: string) => {
+    setSecretKey(key);
+    setCurrentScreen('auction');
+  };
+
+  const handleReset = () => {
+    setSecretKey('');
+    setCurrentScreen('setup');
+  };
 
   return (
     <AppLayout currentScreen={currentScreen} onNavigate={setCurrentScreen}>
       {currentScreen === 'setup' && (
-        <SetupScreen onStart={() => setCurrentScreen('auction')} />
+        <SetupScreen onStart={handleStartAuction} />
       )}
       {currentScreen === 'auction' && (
-        <AuctionScreen onViewResults={() => setCurrentScreen('results')} />
+        <AuctionScreen 
+          onViewResults={() => setCurrentScreen('results')} 
+          secretKey={secretKey}
+        />
       )}
       {currentScreen === 'results' && (
-        <ResultsScreen onReset={() => setCurrentScreen('setup')} />
+        <ResultsScreen onReset={handleReset} />
       )}
       {currentScreen === 'audience' && <AudienceScreen />}
     </AppLayout>

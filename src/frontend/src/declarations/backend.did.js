@@ -40,12 +40,12 @@ export const RoundBidResult = IDL.Record({
 });
 
 export const idlService = IDL.Service({
-  'bidPlayer' : IDL.Func([AuctionBid], [RoundBidResult], []),
+  'bidPlayer' : IDL.Func([AuctionBid, IDL.Text], [RoundBidResult], []),
   'getAuctionState' : IDL.Func([], [AuctionState], ['query']),
   'sellPlayer' : IDL.Func([IDL.Text], [AuctionState], []),
   'startAuction' : IDL.Func([IDL.Text], [AuctionState], []),
-  'startNewAuction' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Vec(IDL.Text)],
+  'startNewAuctionWithSecretKey' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text],
       [AuctionState],
       [],
     ),
@@ -86,12 +86,12 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
-    'bidPlayer' : IDL.Func([AuctionBid], [RoundBidResult], []),
+    'bidPlayer' : IDL.Func([AuctionBid, IDL.Text], [RoundBidResult], []),
     'getAuctionState' : IDL.Func([], [AuctionState], ['query']),
     'sellPlayer' : IDL.Func([IDL.Text], [AuctionState], []),
     'startAuction' : IDL.Func([IDL.Text], [AuctionState], []),
-    'startNewAuction' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text)],
+    'startNewAuctionWithSecretKey' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text), IDL.Text],
         [AuctionState],
         [],
       ),

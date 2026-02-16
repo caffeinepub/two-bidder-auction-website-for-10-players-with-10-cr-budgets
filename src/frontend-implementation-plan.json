@@ -1,30 +1,56 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Improve bid-failure error messaging for invalid bidder selection",
+  "title": "Live read-only Audience (spectator) view for the auction",
   "requirements": [
     {
-      "id": "REQ-9",
-      "summary": "Ensure bid failures caused by an invalid bidder show a clear, grammatical English message in the existing bidding error UI.",
+      "id": "REQ-10",
+      "summary": "Add a read-only Audience screen showing live auction status, bidder budgets, and sold/unsold players list, reachable from navigation.",
       "acceptanceCriteria": [
-        "When the backend rejects a bid due to an invalid bidder, the UI displays the backend error message in readable English (no duplicated words, no confusing reference to \"players\").",
-        "The error state remains within the existing bidding error UI (no crashes; the auction screen continues to function)."
+        "A new Audience screen exists and is reachable from the app navigation (e.g., a new 'Audience' tab).",
+        "The Audience screen renders the current player being auctioned (or a clear message when no round is active).",
+        "The Audience screen renders the current highest bid and highest bidder (or 'No bids yet' when appropriate).",
+        "The Audience screen renders bidder names and remaining budgets.",
+        "The Audience screen renders a players table/list with sold vs unsold status, sold price, and bought-by information.",
+        "The Audience screen does not render any controls that mutate state (no start auction, place bid, finalize sale actions).",
+        "All user-facing text on the Audience screen is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/backendErrors.ts",
+          "path": "frontend/src/components/auction/AudienceScreen.tsx",
           "operation": "create",
-          "description": "Create a small utility to normalize/unwrap errors returned from backend calls into a readable English message (e.g., extract a useful message from thrown values and clean up obvious duplication/whitespace) so the UI can reliably display it. Verify the component's usage instructions before implementing."
+          "description": "Create the read-only Audience (spectator) screen UI that renders: current auctioned player (or a clear 'no round active' message), highest bid + highest bidder (or 'No bids yet'), bidder names with remaining budgets, and a players table with sold/unsold status, sold price, and bought-by fields. Use shadcn-ui components (e.g., Card, Badge, Table, Alert) to match the existing app styling; verify the component's usage instructions before implementing."
         },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire the new Audience screen into the app-level screen switcher by extending the Screen union to include 'audience' and rendering AudienceScreen when selected."
+        },
+        {
+          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Add an 'Audience' navigation item and extend the AppLayout prop types to include the new 'audience' screen so the Audience screen is reachable from the header navigation."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Make the Audience screen automatically refresh by polling auction state via React Query refetch interval, with clean loading and error UI.",
+      "acceptanceCriteria": [
+        "When the auction host performs actions (start auction, place bid, finalize sale) in another session/browser, the Audience screen updates automatically without a manual refresh.",
+        "Polling uses React Query (e.g., a query with a refetch interval) and does not introduce any WebSocket or real-time infrastructure.",
+        "Loading and error states are handled cleanly (e.g., spinner while loading; error alert if state cannot be fetched)."
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/hooks/useAuctionQueries.ts",
           "operation": "modify",
-          "description": "Update the bidding mutation to catch backend bid failures and rethrow a normalized Error message using the new error-normalization utility, so React Query error.message is clear and user-ready when an invalid bidder is provided. Verify the component's usage instructions before implementing."
+          "description": "Extend the auction state query hook to support optional React Query settings (notably refetch interval) so the Audience screen can poll the existing backend auction state query on an interval without duplicating logic."
         },
         {
-          "path": "frontend/src/components/auction/AuctionScreen.tsx",
+          "path": "frontend/src/components/auction/AudienceScreen.tsx",
           "operation": "modify",
-          "description": "Ensure the existing bid error <Alert> displays the improved, normalized mutation error message (and keeps the auction screen functional without crashes) when a bid fails due to an invalid bidder. Verify the component's usage instructions before implementing."
+          "description": "Use the auction state React Query hook with a refetch interval to poll for live updates. Ensure the screen shows a clear loading indicator while fetching and a user-friendly error alert if the auction state cannot be fetched. Use shadcn-ui Alert (and existing Loader icon patterns) for consistent states; verify the component's usage instructions before implementing."
         }
       ]
     }

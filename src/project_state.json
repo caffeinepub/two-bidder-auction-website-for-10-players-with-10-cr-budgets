@@ -1,12 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Website for conducting an auction of 10 players between 2 bidders, where each bidder has a fixed budget of 10 cr.",
-  "architectural_notes": [],
+  "projectStateVersion": 7,
+  "summary": "Website for conducting an auction of 10 players between 2 bidders (each with a fixed budget of 10 cr), with a live audience view, an auction host role to conduct the auction, and live chat.",
+  "architectural_notes": [
+    "Introduce roles: Host/Admin (can control auction) vs Audience/Spectator (read-only).",
+    "Support real-time updates to auction state for live viewing (push/streaming rather than manual refresh).",
+    "Add a live chat capability associated with an auction session."
+  ],
   "known_issues": [
     "Bidding flow bug: when selecting a bidder (with a correct bid amount entered), app shows error message like \"only 2 two bidders can bid\" and blocks bidding."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-build-a-frontend-ui-that-allows-users-to-1-configure-the-auction-enter-2-bidder-names-and-10-player-names-2-run-the-auction-select-current-player-enter-bids-finalize-sale-and-3-view-results-rosters-remaining-budgets-sold-unsold-list-and-sales-history",
@@ -37,6 +41,22 @@
       "title": "Update the user-facing error message shown when a bid fails due to an invalid bidder so it is clear and grammatically correct in English (e.g., indicate that the selected bidder is not part of the auction).",
       "reqIds": [
         "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-audience-spectator-screen-that-lets-viewers-watch-the-auction-live-in-a-read-only-mode-showing-the-current-auctioned-player-current-highest-bid-and-highest-bidder-bidder-remaining-budgets-and-the-sold-unsold-players-list",
+      "title": "Add an Audience (spectator) screen that lets viewers watch the auction live in a read-only mode, showing the current auctioned player, current highest bid and highest bidder, bidder remaining budgets, and the sold/unsold players list.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-audience-spectator-screen-update-automatically-to-reflect-the-live-auction-state-by-polling-the-existing-backend-auction-state-query-on-an-interval",
+      "title": "Make the Audience (spectator) screen update automatically to reflect the live auction state by polling the existing backend auction state query on an interval.",
+      "reqIds": [
+        "REQ-11"
       ],
       "version": 1
     }
@@ -86,6 +106,24 @@
       "reqIds": [
         "REQ-8"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add a live audience/spectator mode so viewers can watch the auction state update in real time without conducting actions.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add an auction host/admin role (\"head of auction\") who can conduct/control auction actions, with audience in read-only mode.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add live chat for the auction (audience/participants can message during the live auction).",
+      "reqIds": [],
       "status": "pending"
     }
   ],

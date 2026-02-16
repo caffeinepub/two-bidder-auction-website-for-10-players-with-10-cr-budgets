@@ -3,8 +3,9 @@ import { AppLayout } from './components/layout/AppLayout';
 import { SetupScreen } from './components/auction/SetupScreen';
 import { AuctionScreen } from './components/auction/AuctionScreen';
 import { ResultsScreen } from './components/auction/ResultsScreen';
+import { AudienceScreen } from './components/auction/AudienceScreen';
 
-type Screen = 'setup' | 'auction' | 'results';
+type Screen = 'setup' | 'auction' | 'results' | 'audience';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('setup');
@@ -20,9 +21,9 @@ function App() {
       {currentScreen === 'results' && (
         <ResultsScreen onReset={() => setCurrentScreen('setup')} />
       )}
+      {currentScreen === 'audience' && <AudienceScreen />}
     </AppLayout>
   );
 }
 
 export default App;
-

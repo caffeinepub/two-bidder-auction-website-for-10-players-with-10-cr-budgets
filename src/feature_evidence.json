@@ -2,12 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-user-facing-error-message-shown-when-a-bid-fails-due-to-an-invalid-bidder-so-it-is-clear-and-grammatically-correct-in-english-e-g-indicate-that-the-selected-bidder-is-not-part-of-the-auction",
-      "featureTitle": "Update the user-facing error message shown when a bid fails due to an invalid bidder so it is clear and grammatically correct in English (e.g., indicate that the selected bidder is not part of the auction).",
+      "featureId": "feature-add-an-audience-spectator-screen-that-lets-viewers-watch-the-auction-live-in-a-read-only-mode-showing-the-current-auctioned-player-current-highest-bid-and-highest-bidder-bidder-remaining-budgets-and-the-sold-unsold-players-list",
+      "featureTitle": "Add an Audience (spectator) screen that lets viewers watch the auction live in a read-only mode, showing the current auctioned player, current highest bid and highest bidder, bidder remaining budgets, and the sold/unsold players list.",
       "files": [
-        "frontend/src/components/auction/AuctionScreen.tsx",
-        "frontend/src/hooks/useAuctionQueries.ts",
-        "frontend/src/utils/backendErrors.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/components/auction/AudienceScreen.tsx",
+        "frontend/src/components/layout/AppLayout.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,7 +17,26 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-9"
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-make-the-audience-spectator-screen-update-automatically-to-reflect-the-live-auction-state-by-polling-the-existing-backend-auction-state-query-on-an-interval",
+      "featureTitle": "Make the Audience (spectator) screen update automatically to reflect the live auction state by polling the existing backend auction state query on an interval.",
+      "files": [
+        "frontend/src/components/auction/AudienceScreen.tsx",
+        "frontend/src/hooks/useAuctionQueries.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
       ],
       "confidence": "high"
     }

@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { AuctionState, AuctionBid } from '../backend';
 import { normalizeBackendError } from '../utils/backendErrors';
 
 const AUCTION_STATE_KEY = ['auctionState'];
 
-export function useAuctionState() {
+export function useAuctionState(options?: Partial<UseQueryOptions<AuctionState>>) {
   const { actor, isFetching } = useActor();
 
   return useQuery<AuctionState>({
@@ -15,6 +15,7 @@ export function useAuctionState() {
       return actor.getAuctionState();
     },
     enabled: !!actor && !isFetching,
+    ...options,
   });
 }
 

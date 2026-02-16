@@ -3,8 +3,8 @@ import { Gavel } from 'lucide-react';
 
 interface AppLayoutProps {
   children: ReactNode;
-  currentScreen: 'setup' | 'auction' | 'results';
-  onNavigate: (screen: 'setup' | 'auction' | 'results') => void;
+  currentScreen: 'setup' | 'auction' | 'results' | 'audience';
+  onNavigate: (screen: 'setup' | 'auction' | 'results' | 'audience') => void;
 }
 
 export function AppLayout({ children, currentScreen, onNavigate }: AppLayoutProps) {
@@ -49,6 +49,16 @@ export function AppLayout({ children, currentScreen, onNavigate }: AppLayoutProp
                 Auction
               </button>
               <button
+                onClick={() => onNavigate('audience')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  currentScreen === 'audience'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                Audience
+              </button>
+              <button
                 onClick={() => onNavigate('results')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   currentScreen === 'results'
@@ -87,4 +97,3 @@ export function AppLayout({ children, currentScreen, onNavigate }: AppLayoutProp
     </div>
   );
 }
-
